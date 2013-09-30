@@ -1,0 +1,155 @@
+<%= javascript_include_tag "swfupload/swfupload" %>
+<%= javascript_include_tag "swfupload/swfupload.queue" %>
+<%= javascript_include_tag "swfupload/swfupload.speed" %>
+<%= javascript_include_tag "swfupload/handlers" %>
+
+<style type="text/css">
+.swfupload {
+  position: absolute;
+  z-index: 1;
+}
+table td {
+  width: 250px;
+  white-space: nowrap;
+  padding-right: 5px;
+}
+table tr:nth-child(2n+1) {
+  background-color: #EEEEEE;
+}
+table td:first-child {
+  font-weight: bold;
+}
+
+table td:nth-child(2) {
+  text-align: right;
+  font-family: monospaced;
+}
+</style>
+
+<script type="text/javascript">
+var swfu;
+
+window.onload = function() {
+  var settings = {
+    debug: <%= Rails.env.development? %>,
+
+    flash_url : "<%= asset_path('swfupload.swf') %>",
+    upload_url: "<%= upload_url %>",
+    post_params: <%= upload_params.to_json.html_safe %>,
+    http_success : [ 200, 201, 204 ],
+
+    file_size_limit : "1 GB",
+    file_types : "*.*",
+    file_types_description : "All Files",
+    file_upload_limit : 10,
+    file_queue_limit : 0,
+    file_post_name : "file",
+
+    moving_average_history_size: 40,
+
+    button_image_url : "<%= asset_path 'dummy.png' %>",
+    button_placeholder_id : "spanButtonPlaceHolder",
+    button_width: 99,
+    button_height: 30,
+    button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
+    button_cursor: SWFUpload.CURSOR.HAND,
+
+    file_queued_handler : fileQueued,
+    //      file_queue_error_handler : fileQueueError,
+    file_dialog_complete_handler : fileDialogComplete,
+    upload_start_handler : uploadStart,
+    upload_progress_handler : uploadProgress,
+    //      upload_error_handler : uploadError,
+    upload_success_handler : uploadSuccess,
+    upload_complete_handler : uploadComplete,
+    //      queue_complete_handler : queueComplete, // Queue plugin event
+
+    custom_settings : {
+      tdFilesQueued : document.getElementById("tdFilesQueued"),
+      tdFilesUploaded : document.getElementById("tdFilesUploaded"),
+      tdErrors : document.getElementById("tdErrors"),
+      tdCurrentSpeed : document.getElementById("tdCurrentSpeed"),
+      tdAverageSpeed : document.getElementById("tdAverageSpeed"),
+      tdMovingAverageSpeed : document.getElementById("tdMovingAverageSpeed"),
+      tdTimeRemaining : document.getElementById("tdTimeRemaining"),
+      tdTimeElapsed : document.getElementById("tdTimeElapsed"),
+      tdPercentUploaded : document.getElementById("tdPercentUploaded"),
+      tdSizeUploaded : document.getElementById("tdSizeUploaded"),
+      tdProgressEventCount : document.getElementById("tdProgressEventCount"),
+      progressBarId : "progressBar",
+      cancelButtonId : "btnCancel"
+    },
+  };
+
+  swfu = new SWFUpload(settings);
+};
+</script>
+
+<%- model_class = Content -%>
+<div class="page-header">
+  <h1><%=t 'title.upload' %></h1>
+</div>
+
+<div id="content" class="row-fluid">
+    <div class="span6">
+      <p>
+      <span id="spanButtonPlaceHolder"></span>
+      <input id="btnUpload" class="btn btn-primary" type="button" value="Select Files" />
+      <input id="btnCancel" class="btn btn-mini" type="button" value="Cancel Uploads" onclick="swfu.cancelQueue()" disabled="disabled" />
+      <div class="progress progress-striped">
+        <div id="progressBar" class="bar" style="width: 0%;"></div>
+      </div>
+      </p>
+      <table cellspacing="0">
+        <tr>
+          <td>Files Queued:</td>
+          <td id="tdFilesQueued"></td>
+        </tr>                   
+        <tr>
+          <td>Files Uploaded:</td>
+          <td id="tdFilesUploaded"></td>
+        </tr>                   
+        <tr>
+          <td>Errors:</td>
+          <td id="tdErrors"></td>
+        </tr>           
+      </table>
+    </div>
+
+    <div class="span6">
+      <table cellspacing="0">
+        <tr>
+          <td>Current Speed:</td>
+          <td id="tdCurrentSpeed"></td>
+        </tr>                   
+        <tr>
+          <td>Average Speed:</td>
+          <td id="tdAverageSpeed"></td>
+        </tr>                   
+        <tr>
+          <td>Moving Average Speed:</td>
+          <td id="tdMovingAverageSpeed"></td>
+        </tr>                   
+        <tr>
+          <td>Time Remaining</td>
+          <td id="tdTimeRemaining"></td>
+        </tr>                   
+        <tr>
+          <td>Time Elapsed</td>
+          <td id="tdTimeElapsed"></td>
+        </tr>                   
+        <tr>
+          <td>Percent Uploaded</td>
+          <td id="tdPercentUploaded"></td>
+        </tr>                   
+        <tr>
+          <td>Size Uploaded</td>
+          <td id="tdSizeUploaded"></td>
+        </tr>                   
+        <tr>
+          <td>Progress Event Count</td>
+          <td id="tdProgressEventCount"></td>
+        </tr>                   
+      </table>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+<style type="text/css">
+#video {
+  display: block;
+  width: 360px;
+  height: 270px;
+}
+#video2 {
+  display: block;
+  width: 360px;
+  height: 270px;
+}
+</style>
+
+<%- model_class = Content -%>
+<div class="page-header">
+  <h1><%=t '.title', default: model_class.model_name.human %></h1>
+</div>
+<h3><%= @content.name %></h3>
+
+<ul class="thumbnails">
+  <li class="span6">
+    <div class="thumbnail">
+      <p style="text-align:center;"><h4>Original</h4></p>
+      <% case @content.mime_type when /^image/ %>
+        <%= image_tag @content.download_url, width: 360 %>
+      <% when 'video/x-flv', 'application/mp4' %>
+        <div align="center">
+        <%= link_to :Original, @content.download_url, id: "video" %>
+        <%= flowplayer_for(:video, asset_path('flowplayer.swf')) do |player|
+          player.playlist [{autoplay: true, autoBuffering: true}]
+          player.onload { 'this.unmute();' }
+        end %>
+        </div>
+      <% else %>
+        <%= image_tag 'noimage.gif', width: 360 %>
+      <% end %>
+      <dl class="dl-horizontal">
+        <dt><strong><%= model_class.human_attribute_name(:size) %>:</strong></dt>
+        <dd><%= number_to_human_size @content.size %></dd>
+        <dt><strong><%= model_class.human_attribute_name(:mime_type) %>:</strong></dt>
+        <dd><%= @content.mime_type %></dd>
+        <dt><strong><%= model_class.human_attribute_name(:created_at) %>:</strong></dt>
+        <dd><%=l @content.created_at %></dd>
+      </dl>
+      <p style="text-align:center;">
+      <%= link_to 'Download', @content.download_url, class: 'btn btn-link' %>
+      </p>
+    </div>
+  </li>
+  <% if @properties %>
+  <li class="span6">
+    <div class="thumbnail">
+      <p style="text-align:center;"><h4>Encoded</h4></p>
+      <div align="center">
+      <%= link_to :Encoded, @transcode.download_url, id: "video2" %>
+      <%= flowplayer_for(:video2, asset_path('flowplayer.swf')) do |player|
+        player.playlist [{autoplay: true, autoBuffering: true}]
+        player.onload { 'this.unmute();' }
+      end %>
+      </div>
+      <dl class="dl-horizontal">
+        <dt><strong><%= model_class.human_attribute_name(:size) %>:</strong></dt>
+        <dd><%= number_to_human_size @properties.content_length %></dd>
+        <dt><strong><%= model_class.human_attribute_name(:mime_type) %>:</strong></dt>
+        <dd><%= @properties.content_type %></dd>
+        <dt><strong><%= model_class.human_attribute_name(:created_at) %>:</strong></dt>
+        <dd><%=l @properties.last_modified %></dd>
+      </dl>
+      <p style="text-align:center;">
+      <%= link_to 'Download', @transcode.download_url, class: 'btn btn-link' %>
+      </p>
+  </div>
+  </li>
+  <% end %>
+</ul>
+
+<div class="form-actions">
+  <%= link_to t('.back', default: t("helpers.links.back")), contents_path, class: 'btn'  %>
+  <%= link_to t('.destroy', default: t("helpers.links.destroy")),
+    content_path(@content),
+    method: 'delete',
+    data: { confirm: t('.confirm', default: t("helpers.links.confirm", default: 'Are you sure?')) },
+    class: 'btn btn-danger' %>
+</div>

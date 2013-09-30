@@ -1,0 +1,22 @@
+defaults: &defaults
+  aws:
+    access_key_id:     <%= ENV['AWS_ACCESS_KEY_ID'] %>
+    secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
+    upload:
+      bucket:          <%= ENV['AWS_BUCKET_UPLOAD'] %>
+      max_filesize:    <%= 100.megabyte %>
+      expires:         <%= 1.minutes %>
+    encoded:
+      bucket:          <%= ENV['AWS_BUCKET_ENCODED'] %>
+    transcode:
+      pipeline_id:     <%= ENV['AMAZON_ELASTIC_TRANSCODER_PIPELINE_ID'] %>
+      preset_id:       '1351620000000-000060'
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
